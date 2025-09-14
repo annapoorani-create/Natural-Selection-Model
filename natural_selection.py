@@ -70,7 +70,7 @@ def death_by_predation(a,b,c):
         i[0] = math.floor(i[0]*0.9)
         i[1] = math.floor(i[1]*predation_rate)
         i[2] = math.floor(i[2]*predation_rate)
-    return math.floor(a*0.9), math.floor(b*0.5), math.floor(c*0.5)
+    return math.floor(a*0.9), math.floor(b*predation_rate), math.floor(c*predation_rate)
 
 
 if st.button('Generate animation'):
@@ -115,6 +115,7 @@ if st.button('Generate animation'):
     
         bars = ax.barh(x, data, color=['tab:blue', 'tab:red', 'tab:green'])
         tick_labels = ['aa', 'Aa', 'AA']
+        ax.set_yticks(x)     
         ax.set_yticklabels(tick_labels)
     
         # compute and draw the year label for this frame

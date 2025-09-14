@@ -1,0 +1,173 @@
+# Some imports
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+from IPython.display import HTML
+import math
+import streamlit as st
+import random
+
+# Defining the starting points
+number_of_aa = st.slider("How many aa (light-color) moths do you want to start with?",5,40,10)
+number_of_Aa = st.slider("How many Aa (dark-color with ability to pass on light colored genes) moths do you want to start with?",5,100,20)
+number_of_AA = st.slider("How many AA (dark-color) moths do you want to start with?",50,300,100)
+predation_rate = st.slider("Pick a predation rate for the unfavored color (percent)",0,80,50)/100
+list_of_counts = []
+final_list = []
+aa_list = []
+Aa_list = []
+AA_list = []
+
+# Making a reproduction function
+
+def reproduce(a,b,c):
+    # every mother has 4 children
+    m = 0
+    n = 0
+    l = 0
+
+    if math.log10(a/2) > 4:
+        x = math.ceil(math.log10(a/2))
+        ml = [1]*math.floor(a/(2*(10**(x-4)))) + [2]*math.floor(b/(2*(10**(x-4)))) + [3]*math.floor(c/(2*(10**(x-4))))
+    else:
+        ml = [1]*math.floor(a/2) + [2]*math.floor(b/2) + [3]*math.floor(c/2)
+    fl = ml.copy()
+    random.shuffle(ml)
+    random.shuffle(fl)
+    zipped = list(zip(ml, fl))
+
+    count12 = sum(1 for x in zipped if x in [(1,2), (2,1)])
+    count13 = sum(1 for x in zipped if x in [(1,3), (3,1)])
+    count23 = sum(1 for x in zipped if x in [(2,3), (3,2)])
+    count11 = sum(1 for x in zipped if x in [(1,1)])
+    count22 = sum(1 for x in zipped if x in [(2,2)])
+    count33 = sum(1 for x in zipped if x in [(3,3)])
+
+
+    if math.log10(a/2) > 4:
+        m = (2*count12 + 4*count11 + 1*count22) * (10**(x-4))
+        n = (2*count12 + 2*count23 + 4*count13 + 2*count22) * (10**(x-4))
+        l = (2*count23 + 1*count22 + 4*count33) * (10**(x-4))
+    else:
+        m = (2*count12 + 4*count11 + 1*count22)
+        n = (2*count12 + 2*count23 + 4*count13 + 2*count22)
+        l = (2*count23 + 1*count22 + 4*count33)
+    
+    list_of_counts.append([math.floor(m),math.floor(n),math.floor(l)])
+    
+    return a + math.floor(m), b + math.floor(n), c + math.floor(l)
+    
+# Killing off things that die of old age
+def death_by_natural_causes(a,b,c,list_of_counts,index):
+    return a - list_of_counts[index-4][0], b - list_of_counts[index-4][1], c - list_of_counts[index-4][2]
+
+
+# Killing off things that die by predation
+def death_by_predation(a,b,c):
+    # Ensuring we don't double-kill by scaling each generation appropriately, which are 
+    # then the values we give to the old age function
+    for i in list_of_counts:
+        i[0] = math.floor(i[0]*0.9)
+        i[1] = math.floor(i[1]*predation_rate)
+        i[2] = math.floor(i[2]*predation_rate)
+    return math.floor(a*0.9), math.floor(b*0.5), math.floor(c*0.5)
+
+
+if st.button('Generate animation'):
+    for i in range(50):
+    
+        number_of_aa, number_of_Aa, number_of_AA = reproduce(number_of_aa, number_of_Aa, number_of_AA)
+    
+        number_of_aa, number_of_Aa, number_of_AA = death_by_predation(number_of_aa,number_of_Aa,number_of_AA)
+    
+        if i > 3:
+            number_of_aa, number_of_Aa, number_of_AA = death_by_natural_causes(number_of_aa, number_of_Aa, number_of_AA, list_of_counts,i)
+    
+        # No negative populations!!
+        if number_of_AA < 0:
+            number_of_AA = 0
+        if number_of_Aa < 0:
+            number_of_Aa = 0
+        if number_of_aa < 0:
+            number_of_aa = 0
+    
+        # making the data for the animated chart
+        final_list.append([number_of_aa,number_of_Aa,number_of_AA])
+        aa_list.append(number_of_aa)
+        Aa_list.append(number_of_Aa)
+        AA_list.append(number_of_AA)
+    with st.expander("Your graph is being generated. This may take up to 20 seconds. Please be patient! In the mean time, here's an overview of the algorithm used in this model."):
+        st.write("This model loops through 50 generations, in which newborns are created, some organisms die by predation, and others die of old age (4 years)")
+    
+    st.subheader("Animation")
+
+    years_per_frame = 1     # change this if 1 frame != 1 year
+    start_year = 0
+    
+    fig, ax = plt.subplots()
+    x = np.array([1, 2, 3])
+    artists = []
+    fps = 7
+    
+    for i, frame in enumerate(final_list):
+        data = np.array(frame, dtype=float)
+        data = np.log1p(data)
+    
+        bars = ax.barh(x, data, color=['tab:blue', 'tab:red', 'tab:green'])
+    
+        # compute and draw the year label for this frame
+        year = start_year + i * years_per_frame
+        txt = ax.text(
+            0.98, 0.95, f"Year {year:,}",
+            transform=ax.transAxes, ha='right', va='top',
+            fontsize=12,
+            bbox=dict(boxstyle="round,pad=0.2", fc="white", alpha=0.7),
+            animated=True  # important when using blit=True
+        )
+    
+        # include text in this frame's artist list
+        artists.append(list(bars) + [txt])
+
+    ani = animation.ArtistAnimation(fig, artists, interval=int(1000/fps), blit=True, repeat=False)
+    
+    # Save to GIF using Pillow
+    gif_path = "pop_anim.gif"
+    ani.save(gif_path, writer="pillow", fps=fps)
+    st.image(gif_path)
+
+    
+    # X-axis is just the index (time steps)
+    x = range(len(aa_list))
+    
+    # Create a new figure
+    fig, ax = plt.subplots(3, 1, figsize=(8, 24))
+
+    # Blue (aa)
+    ax[0].plot(x, aa_list, marker='o', linestyle='-',color='blue')
+
+    
+    # Add labels and title
+    ax[0].set_xlabel("Time")
+    ax[0].set_ylabel("Value")
+    ax[0].set_title("Change Over Time for Moths with aa Alleles")
+
+    # Red (Aa)
+    ax[1].plot(x, Aa_list, marker='o', linestyle='-',color='red')
+
+    
+    # Add labels and title
+    ax[1].set_xlabel("Time")
+    ax[1].set_ylabel("Value")
+    ax[1].set_title("Change Over Time for Moths with Aa Alleles")
+
+    # Gree (AA)
+    ax[2].plot(x, AA_list, marker='o', linestyle='-',color='green')
+
+    
+    # Add labels and title
+    ax[2].set_xlabel("Time")
+    ax[2].set_ylabel("Value")
+    ax[2].set_title("Change Over Time for Moths with AA Alleles")
+    
+    # Render in Streamlit
+    st.pyplot(fig)

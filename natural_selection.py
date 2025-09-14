@@ -114,6 +114,8 @@ if st.button('Generate animation'):
         data = np.log1p(data)
     
         bars = ax.barh(x, data, color=['tab:blue', 'tab:red', 'tab:green'])
+        tick_labels = ['aa', 'Aa', 'AA']
+        ax.set_yticklabels(tick_labels)
     
         # compute and draw the year label for this frame
         year = start_year + i * years_per_frame

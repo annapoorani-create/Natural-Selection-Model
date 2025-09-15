@@ -11,7 +11,8 @@ import random
 number_of_aa = st.slider("How many aa (light-color) moths do you want to start with?",5,40,10)
 number_of_Aa = st.slider("How many Aa (dark-color with ability to pass on light colored genes) moths do you want to start with?",5,100,20)
 number_of_AA = st.slider("How many AA (dark-color) moths do you want to start with?",50,300,100)
-predation_rate = st.slider("Pick a predation rate for the unfavored color (percent)",0,80,50)/100
+survival_rate_dark = st.slider("Pick a survival rate following predation for the Aa and AA moths (percent)",0,90,50)/100
+survival_rate_light = st.slider("Pick a survival rate follwing predation for the aa moths (percent)",0,90,50)/100
 list_of_counts = []
 final_list = []
 aa_list = []
@@ -98,10 +99,10 @@ def death_by_predation(a,b,c):
     # Ensuring we don't double-kill by scaling each generation appropriately, which are 
     # then the values we give to the old age function
     for i in list_of_counts:
-        i[0] = math.floor(i[0]*0.7)
-        i[1] = math.floor(i[1]*(1-predation_rate))
-        i[2] = math.floor(i[2]*(1-predation_rate))
-    return math.floor(a*0.7), math.floor(b*predation_rate), math.floor(c*predation_rate)
+        i[0] = math.floor(i[0]*survival_rate_light)
+        i[1] = math.floor(i[1]*(survival_rate_dark))
+        i[2] = math.floor(i[2]*(survival_rate_dark))
+    return math.floor(a*survival_rate_light), math.floor(b*survival_rate_dark), math.floor(c*survival_rate_dark)
 
 
 if st.button('Generate animation'):

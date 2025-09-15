@@ -19,8 +19,39 @@ Aa_list = []
 AA_list = []
 
 # Making a reproduction function
-
 def reproduce(a,b,c):
+    # every mother has 4 children
+    m = 0
+    n = 0
+    l = 0
+    
+    # a block
+    m += 4 * a * (a/(a+b+c)) * 1/2
+    m += 2 * a * (b/(a+b+c)) * 1/2
+    n += 2 * a * (b/(a+b+c)) * 1/2
+    n += 4 * a * (c/(a+b+c)) * 1/2
+
+    # b block
+    m += 2 * b * (a/(a+b+c)) * 1/2
+    n += 2 * b * (a/(a+b+c)) * 1/2
+    m += 1 * b * (b/(a+b+c)) * 1/2
+    n += 2 * b * (b/(a+b+c)) * 1/2
+    l += 1 * b * (b/(a+b+c)) * 1/2
+    l += 2 * b * (c/(a+b+c)) * 1/2
+    n += 2 * b * (c/(a+b+c)) * 1/2
+
+    # c block
+    n += 4 * c * (a/(a+b+c)) * 1/2
+    l += 2 * c * (b/(a+b+c)) * 1/2
+    m += 2 * c * (b/(a+b+c)) * 1/2
+    l += 4 * c * (c/(a+b+c)) * 1/2
+
+    list_of_counts.append([math.floor(m),math.floor(n),math.floor(l)])
+    
+    
+    return a + math.floor(m), b + math.floor(n), c + math.floor(l)
+    
+def a_reproduce(a,b,c):
     # every mother has 4 children
     m = 0
     n = 0

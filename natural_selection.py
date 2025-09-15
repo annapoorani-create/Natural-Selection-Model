@@ -105,7 +105,7 @@ def death_by_predation(a,b,c):
 
 
 if st.button('Generate animation'):
-    for i in range(50):
+    for i in range(150):
     
         number_of_aa, number_of_Aa, number_of_AA = reproduce(number_of_aa, number_of_Aa, number_of_AA)
     

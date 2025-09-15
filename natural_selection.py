@@ -15,6 +15,9 @@ number_of_Aa = st.slider("How many Aa (dark-color with ability to pass on light 
 number_of_AA = st.slider("How many AA (dark-color) moths do you want to start with?",50,300,100)
 survival_rate_dark = st.slider("Pick a survival rate following predation for the Aa and AA moths (percent)",0,90,50)/100
 survival_rate_light = st.slider("Pick a survival rate follwing predation for the aa moths (percent)",0,90,50)/100
+options = ["Deterministic expectations", "Stochastic mating"]
+choice = st.radio("Select one option for mating method. Deterministic expectations just means it goes off of pure, pre-computed probabilities, 
+whereas stochastic mating (MUCH slower) takes a sample of the males and females, shuffles them, mates them, and then scales to generalize to the full population.", options)
 list_of_counts = []
 final_list = []
 aa_list = []
@@ -109,8 +112,10 @@ def death_by_predation(a,b,c):
 
 if st.button('Generate animation'):
     for i in range(150):
-    
-        number_of_aa, number_of_Aa, number_of_AA = reproduce(number_of_aa, number_of_Aa, number_of_AA)
+        if choice == 'Deterministic expectations':
+            number_of_aa, number_of_Aa, number_of_AA = reproduce(number_of_aa, number_of_Aa, number_of_AA)
+        else:
+            number_of_aa, number_of_Aa, number_of_AA = a_reproduce(number_of_aa, number_of_Aa, number_of_AA)
     
         number_of_aa, number_of_Aa, number_of_AA = death_by_predation(number_of_aa,number_of_Aa,number_of_AA)
     

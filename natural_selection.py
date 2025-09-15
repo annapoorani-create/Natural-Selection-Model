@@ -169,6 +169,8 @@ if st.button('Generate animation'):
         # include text in this frame's artist list
         artists.append(list(bars) + [txt])
 
+        ax.set_xlabel('Natural log of population')
+
     ani = animation.ArtistAnimation(fig, artists, interval=int(1000/fps), blit=True, repeat=False)
     
     # Save to GIF using Pillow

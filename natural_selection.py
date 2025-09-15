@@ -98,10 +98,10 @@ def death_by_predation(a,b,c):
     # Ensuring we don't double-kill by scaling each generation appropriately, which are 
     # then the values we give to the old age function
     for i in list_of_counts:
-        i[0] = math.floor(i[0]*0.9)
+        i[0] = math.floor(i[0]*0.7)
         i[1] = math.floor(i[1]*predation_rate)
         i[2] = math.floor(i[2]*predation_rate)
-    return math.floor(a*0.9), math.floor(b*predation_rate), math.floor(c*predation_rate)
+    return math.floor(a*0.7), math.floor(b*predation_rate), math.floor(c*predation_rate)
 
 
 if st.button('Generate animation'):

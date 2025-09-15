@@ -7,6 +7,8 @@ import math
 import streamlit as st
 import random
 
+st.header('Natural Selection Simulator')
+st.write('Read a technical explanation here: https://docs.google.com/document/d/1QvGz8YKz-xLVddxuC2ExDUw0CIDVOkTzRr3YkFb91yg/edit?usp=sharing')
 # Defining the starting points
 number_of_aa = st.slider("How many aa (light-color) moths do you want to start with?",5,40,10)
 number_of_Aa = st.slider("How many Aa (dark-color with ability to pass on light colored genes) moths do you want to start with?",5,100,20)
